@@ -66,7 +66,7 @@ struct _HistogramImager {
      */
     gdouble total_points_plotted;
     gulong peak_density;
-    GTimeVal render_start_time;
+    gint64 render_start_time;
 
     guint *histogram;
     gboolean histogram_clear_flag;

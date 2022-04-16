@@ -78,7 +78,7 @@ struct _Explorer {
     double               last_mouse_y;
     double               last_click_x;
     double               last_click_y;
-    GTimeVal             last_tool_idle_update;
+    gint64               last_tool_idle_update;
 
     GtkWidget*           anim_curve;
     gboolean             allow_transition_changes;
@@ -90,7 +90,7 @@ struct _Explorer {
 
     gboolean             unpause_on_restore;
 
-    GTimeVal             last_anim_frame_time;
+    gint64               last_anim_frame_time;
 
     GQueue*              history_queue;
     guint                history_timer;

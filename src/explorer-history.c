@@ -33,7 +33,7 @@
  * thumbnail are both owned by the history node.
  */
 typedef struct {
-    GTimeVal   timestamp;   /* The time at which this node was created */
+    gint64     timestamp;   /* The time at which this node was created */
     GdkPixbuf* thumbnail;   /* Scaled-down version of the current histogram */
     gchar*     params;      /* Serialized image parameters */
     Explorer*  explorer;    /* For convenience in callbacks */
@@ -63,8 +63,8 @@ static void         explorer_append_history (Explorer* self, HistoryNode *node);
 static void         explorer_prune_history  (Explorer* self, int max_nodes);
 static void         explorer_update_history_sensitivity (Explorer* self);
 
-static gdouble      timeval_subtract          (GTimeVal *a, GTimeVal *b);
-static gchar*       explorer_strdup_time      (GTimeVal *tv);
+static gdouble      timeval_subtract          (gint64 a, gint64 b);
+static gchar*       explorer_strdup_time      (gint64 tv);
 static void         explorer_add_go_item      (Explorer *self, GList *node_link);
 static void         explorer_cleanup_go_items (Explorer *self);
 
@@ -112,7 +112,7 @@ static HistoryNode* history_node_new   (HistogramImager* map)
     HistoryNode* self = g_new0(HistoryNode, 1);
     gint width, height;
 
-    g_get_current_time(&self->timestamp);
+    self->timestamp = g_get_monotonic_time();
     self->params = parameter_holder_save_string(PARAMETER_HOLDER(map));
 
     /* Use the normal icon size plus a little extra */
@@ -188,18 +188,17 @@ static void         explorer_update_history_sensitivity (Explorer* self)
 /******************************************************************* Time Utilities */
 /************************************************************************************/
 
-static gdouble      timeval_subtract(GTimeVal *a, GTimeVal *b)
+static gdouble      timeval_subtract(gint64 a, gint64 b)
 {
-    return (a->tv_sec - b->tv_sec) +
-	(a->tv_usec - b->tv_usec) / 1000000.0;
+    return (a - b) / 1000000.0;
 }
 
-static gchar*       explorer_strdup_time      (GTimeVal *tv)
+static gchar*       explorer_strdup_time      (gint64 tv)
 {
     double units;
-    GTimeVal now;
-    g_get_current_time(&now);
-    units = timeval_subtract(&now, tv);
+    gint64 now;
+    now = g_get_monotonic_time();
+    units = timeval_subtract(now, tv);
 
     if (units < 120.0)
 	return g_strdup_printf("%.01f seconds ago", units);
@@ -229,7 +228,7 @@ static void         explorer_add_go_item      (Explorer *self, GList *node_link)
     gchar* label;
 
     /* Add the timestamp */
-    label = explorer_strdup_time(&node->timestamp);
+    label = explorer_strdup_time(node->timestamp);
     item = gtk_image_menu_item_new_with_label(label);
     g_free(label);
 
@@ -302,7 +301,7 @@ static void         on_go_menu_show    (GtkWidget *menu, Explorer *self)
     int i, num_scaled_items;
     GList *current;
     gdouble t_total, t;
-    GTimeVal *scaled_reference;
+    gint64 scaled_reference;
     HistoryNode* node;
     explorer_cleanup_go_items(self);
 
@@ -332,9 +331,9 @@ static void         on_go_menu_show    (GtkWidget *menu, Explorer *self)
     if (!current)
 	return;
     node = current->data;
-    scaled_reference = &node->timestamp;
+    scaled_reference = node->timestamp;
     t_total = timeval_subtract(scaled_reference,
-			       &((HistoryNode*)g_queue_peek_head(self->history_queue))->timestamp);
+			       ((HistoryNode*)g_queue_peek_head(self->history_queue))->timestamp);
     num_scaled_items = MIN(self->history_queue->length - max_linear_items,
 			   max_scaled_items);
     if (num_scaled_items <= 0)
@@ -350,7 +349,7 @@ static void         on_go_menu_show    (GtkWidget *menu, Explorer *self)
 		return;
 
 	    node = current->data;
-	    t  = timeval_subtract(scaled_reference, &node->timestamp);
+	    t  = timeval_subtract(scaled_reference, node->timestamp);
 
 	    if (t > (i*t_total/num_scaled_items))
 		break;

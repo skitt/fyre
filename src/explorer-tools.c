@@ -208,7 +208,7 @@ gboolean explorer_update_tools(Explorer *self) {
     const ToolInfo *tool = explorer_get_current_tool(self);
     ToolInput ti;
     gint ix, iy;
-    GTimeVal now;
+    gint64 now;
     memset(&ti, 0, sizeof(ti));
 
     gdk_window_get_pointer(self->view->window, &ix, &iy, &ti.state);
@@ -217,9 +217,8 @@ gboolean explorer_update_tools(Explorer *self) {
     explorer_fill_toolinput_relative_positions(self, &ti);
 
     /* Compute the delta time */
-    g_get_current_time(&now);
-    ti.delta_time = ((now.tv_usec - self->last_tool_idle_update.tv_usec) / 1000000.0 +
-		     (now.tv_sec  - self->last_tool_idle_update.tv_sec ));
+    now = g_get_monotonic_time();
+    ti.delta_time = (now - self->last_tool_idle_update) / 1000000.0;
     self->last_tool_idle_update = now;
 
     if (tool && self->tool_active && (tool->flags & TOOL_USE_IDLE)) {

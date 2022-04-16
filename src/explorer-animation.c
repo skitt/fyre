@@ -341,7 +341,7 @@ static void on_anim_curve_changed(GtkWidget *widget, gpointer user_data) {
 void explorer_update_animation(Explorer *self) {
     /* Move on to the next frame if we're playing an animation
      */
-    GTimeVal now;
+    gint64 now;
     double diff, new_value;
     GtkRange *range;
     GtkAdjustment *adj;
@@ -350,9 +350,8 @@ void explorer_update_animation(Explorer *self) {
     if (!self->playing_animation)
 	return;
 
-    g_get_current_time(&now);
-    diff = ((now.tv_usec - self->last_anim_frame_time.tv_usec) / 1000000.0 +
-	    (now.tv_sec  - self->last_anim_frame_time.tv_sec ));
+    now = g_get_monotonic_time();
+    diff = (now - self->last_anim_frame_time) / 1000000.0;
     self->last_anim_frame_time = now;
 
     range = GTK_RANGE(glade_xml_get_widget(self->xml, "anim_scale"));
