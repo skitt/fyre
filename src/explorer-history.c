@@ -132,7 +132,7 @@ static void         history_node_apply (HistoryNode* self, HistogramImager* map)
 static void         history_node_free  (HistoryNode* self)
 {
     if (self->thumbnail) {
-	gdk_pixbuf_unref(self->thumbnail);
+	g_object_unref(self->thumbnail);
 	self->thumbnail = NULL;
     }
     if (self->params) {

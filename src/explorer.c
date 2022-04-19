@@ -363,11 +363,11 @@ update_image_preview (GtkFileChooser *chooser, GtkImage *image) {
             gdk_draw_pixbuf (pixmap, NULL, emblem_pixbuf, 0, 0, width - 16, height - 16, 31, 31, GDK_RGB_DITHER_NONE, 0, 0);
         else if (gdk_pixbuf_get_option (temp, "tEXt::de_jong_params"))
             gdk_draw_pixbuf (pixmap, NULL, emblem_pixbuf, 0, 0, width - 16, height - 16, 31, 31, GDK_RGB_DITHER_NONE, 0, 0);
-        gdk_pixbuf_unref (temp);
+        g_object_unref (temp);
     }
 
     if (image_pixbuf)
-	gdk_pixbuf_unref (image_pixbuf);
+	g_object_unref (image_pixbuf);
 
     gtk_image_set_from_pixmap (GTK_IMAGE (image), pixmap, NULL);
     gdk_pixmap_unref (pixmap);

@@ -278,7 +278,7 @@ histogram_imager_dispose (GObject *gobject)
 	self->histogram = NULL;
     }
     if (self->image) {
-	gdk_pixbuf_unref (self->image);
+	g_object_unref (self->image);
 	self->image = NULL;
     }
     if (self->color_table.table) {
@@ -560,7 +560,7 @@ histogram_imager_load_image_file (HistogramImager *self, const gchar *filename, 
 	    *error = nerror;
 	}
     }
-    gdk_pixbuf_unref (pixbuf);
+    g_object_unref (pixbuf);
 }
 
 void
@@ -1231,7 +1231,7 @@ histogram_imager_check_dirty_flags (HistogramImager *self)
 	    self->histogram = NULL;
 	}
 	if (self->image) {
-	    gdk_pixbuf_unref (self->image);
+	    g_object_unref (self->image);
 	    self->image = NULL;
 	}
 

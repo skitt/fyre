@@ -128,7 +128,7 @@ static void update_color_sample(ColorButton *self) {
     gdk_window_set_back_pixmap(self->drawing_area->window, pixmap, FALSE);
     gdk_window_clear(self->drawing_area->window);
 
-    gdk_pixbuf_unref(color);
+    g_object_unref(color);
     gdk_pixmap_unref(pixmap);
 }
 

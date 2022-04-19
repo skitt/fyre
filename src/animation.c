@@ -146,7 +146,7 @@ void animation_keyframe_store (Animation       *self,
 	gtk_list_store_set(self->model, iter,
 			   ANIMATION_MODEL_THUMBNAIL, thumbnail,
 			   -1);
-	gdk_pixbuf_unref(thumbnail);
+	g_object_unref(thumbnail);
     }
 }
 

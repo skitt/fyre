@@ -91,7 +91,7 @@ ProbabilityMap*  probability_map_new_file_channel    (const gchar*          file
 
     g_assert(pixbuf != NULL);
     self = probability_map_new_pixbuf_channel(pixbuf, channel);
-    gdk_pixbuf_unref(pixbuf);
+    g_object_unref(pixbuf);
 
     return self;
 }
